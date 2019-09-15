@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 public class httpc {
 
     public static void main(String[] args) {
-        // Quick example of joptsimple
+        // Quick example of jopt-simple
         OptionParser parser = new OptionParser("h:");
         OptionSpec<Void> helpOption = parser
                 .accepts("help", "show help").forHelp();
