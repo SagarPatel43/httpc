@@ -36,10 +36,11 @@ public class RequestService {
             socket.close();
 
         } catch (UnknownHostException e) {
+            // TODO double check exceptions everywhere
             System.err.println("Host given to InetAddress is invalid (invalid host)");
             e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("Network error or something idk");
+            System.err.println("Network error");
             e.printStackTrace();
         }
 

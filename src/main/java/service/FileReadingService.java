@@ -16,7 +16,7 @@ public class FileReadingService {
 
             String line;
             while((line = br.readLine()) != null) {
-                body.append(line);
+                body.append(line).append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

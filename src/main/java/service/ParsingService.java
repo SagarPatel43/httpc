@@ -23,7 +23,7 @@ public class ParsingService {
         HELP_METHODS.put(POST, POST_HELP);
     }
 
-    public static BaseMethod parseRequest(String[] args) {
+    public static BaseMethod parseRequest(String[] args) throws Exception {
         BaseMethod httpMethod = null;
 
         // No arguments specified
@@ -36,7 +36,7 @@ public class ParsingService {
             //TODO print help
             System.out.println("help");
         }
-        // Two arguments, where first on is HELP (e.g. help post)
+        // Two arguments, where first one is HELP (e.g. help post)
         else if (args.length == 2 && args[0].equalsIgnoreCase(HELP)) {
             String method = args[1].toUpperCase();
 
@@ -56,8 +56,15 @@ public class ParsingService {
             // Last argument should always be URL
             String urlHost = args[args.length - 1].replaceAll("(http://|https://)", "");
             // Clean up URL - extract host and URI
-            String host = urlHost.substring(0, urlHost.indexOf("/"));
-            String uri = urlHost.substring(urlHost.indexOf("/"));
+            // TODO this can break if there's no /
+            String host;
+            String uri;
+            if (urlHost.contains("/")) {
+                host = urlHost.substring(0, urlHost.indexOf("/"));
+                uri = urlHost.substring(urlHost.indexOf("/"));
+            } else {
+                throw new Exception("bad");
+            }
 
             // First check if valid HTTP method was provided (GET/POST) and flags
             if (METHODS.contains(requestMethod)) {
@@ -67,6 +74,7 @@ public class ParsingService {
                 System.err.println("Only GET/POST methods are currently supported");
             }
 
+            // TODO pretty sure this can NPE so try catch
             httpMethod.setHost(host);
             httpMethod.setUri(uri);
         }

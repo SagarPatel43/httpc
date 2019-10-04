@@ -47,7 +47,12 @@ public final class OptionsValidator {
                 verbose = true;
             }
             if (options.has(headersSpec)) {
-                headers.addAll(options.valuesOf(headersSpec));
+                for (String header : options.valuesOf(headersSpec)) {
+                    // Ignore explicit content-length headers, will be handled by the client.
+                    if (!header.contains(CONTENT_LENGTH)) {
+                        headers.add(header);
+                    }
+                }
             }
 
             if (method.equalsIgnoreCase(POST)) {
