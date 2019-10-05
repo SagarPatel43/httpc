@@ -1,5 +1,6 @@
 package service;
 
+import exception.HttpcException;
 import method.BaseMethod;
 import validate.OptionsValidator;
 
@@ -23,18 +24,17 @@ public class ParsingService {
         HELP_METHODS.put(POST, POST_HELP);
     }
 
-    public static BaseMethod parseRequest(String[] args) throws Exception {
+    public static BaseMethod parseRequest(String[] args) throws HttpcException {
         BaseMethod httpMethod = null;
 
-        // No arguments specified
-        if (args.length == 0) {
-            //TODO print help
-            System.err.println("No arguments specified");
+        // No arguments specified or 1 argument specified (that's not help)
+        if (args.length == 0 || (args.length == 1 && !args[0].equalsIgnoreCase(HELP))) {
+            throw new HttpcException("Invalid command");
         }
         // Singular argument... can only be HELP.
         else if (args.length == 1 && args[0].equalsIgnoreCase(HELP)) {
-            //TODO print help
-            System.out.println("help");
+            System.out.println(GENERAL_HELP);
+            System.exit(0);
         }
         // Two arguments, where first one is HELP (e.g. help post)
         else if (args.length == 2 && args[0].equalsIgnoreCase(HELP)) {
@@ -42,28 +42,26 @@ public class ParsingService {
 
             if (HELP_METHODS.get(method) != null) {
                 System.out.println(HELP_METHODS.get(method));
+                System.exit(0);
             }
             else {
-                //TODO print help
-                //TODO make it an exception
-                System.err.println("Only GET/POST methods are currently supported");
+                throw new HttpcException("Only GET/POST methods are currently supported");
             }
         }
-        // Not help, request
+        // Not help, therefore treat as request (at least 2 arguments)
         else {
             // First argument should always be HTTP method
             String requestMethod = args[0].toUpperCase();
             // Last argument should always be URL
             String urlHost = args[args.length - 1].replaceAll("(http://|https://)", "");
             // Clean up URL - extract host and URI
-            // TODO this can break if there's no /
             String host;
             String uri;
             if (urlHost.contains("/")) {
                 host = urlHost.substring(0, urlHost.indexOf("/"));
                 uri = urlHost.substring(urlHost.indexOf("/"));
             } else {
-                throw new Exception("bad");
+                throw new HttpcException("Invalid URL provided, make sure the URL contains a location (e.g. example.com/status)");
             }
 
             // First check if valid HTTP method was provided (GET/POST) and flags
@@ -71,10 +69,9 @@ public class ParsingService {
                 httpMethod = OptionsValidator.validate(requestMethod, args);
             }
             else {
-                System.err.println("Only GET/POST methods are currently supported");
+                throw new HttpcException("Only GET/POST methods are currently supported");
             }
 
-            // TODO pretty sure this can NPE so try catch
             httpMethod.setHost(host);
             httpMethod.setUri(uri);
         }

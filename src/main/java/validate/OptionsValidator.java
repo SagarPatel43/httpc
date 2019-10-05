@@ -1,5 +1,6 @@
 package validate;
 
+import exception.HttpcException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -19,7 +20,7 @@ public final class OptionsValidator {
     private OptionsValidator() {
     }
 
-    public static BaseMethod validate(String method, String[] args) {
+    public static BaseMethod validate(String method, String[] args) throws HttpcException {
         try {
             boolean verbose = false;
             List<String> headers = new ArrayList<>();
@@ -60,7 +61,8 @@ public final class OptionsValidator {
 
                 if (inline != null && options.has(inline)) {
                     body = options.valueOf(inline);
-                } else if (file != null && options.has(file)) {
+                }
+                else if (file != null && options.has(file)) {
                     String filePath = options.valueOf(file);
                     body = FileReadingService.getBodyFromFile(filePath);
                 }
@@ -70,12 +72,10 @@ public final class OptionsValidator {
             }
 
             return new GetMethod("", "", headers, verbose);
-        } catch(Exception e) {
-            System.err.println("idk exception names");
-            System.err.println(e);
+        } catch (HttpcException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HttpcException("Something went wrong while trying to parse the flags provided");
         }
-
-        return null;
     }
-
 }

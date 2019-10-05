@@ -1,17 +1,20 @@
+import exception.HttpcException;
 import method.BaseMethod;
 import service.ParsingService;
 import service.RequestService;
 
+import static constant.Constants.GENERAL_HELP;
+
 public class httpc {
 
     public static void main(String[] args) {
-        BaseMethod httpMethod = null;
+        BaseMethod httpMethod;
         try {
             httpMethod = ParsingService.parseRequest(args);
             RequestService.execute(httpMethod);
-        } catch (Exception e) {
+        } catch (HttpcException e) {
             e.printStackTrace();
-            System.err.println("Something bad happened, print help, I want everything handled from here k thanks");
+            System.out.println(GENERAL_HELP);
         }
 
     }
