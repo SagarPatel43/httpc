@@ -6,6 +6,8 @@ public abstract class Constants {
     public final static String GET = "GET";
     public final static String POST = "POST";
     public final static String HTTP1 = "HTTP/1.0";
+    public final static String REDIRECT_PREFIX = "3";
+    public final static String LOCATION = "Location";
 
     public final static String GENERAL_HELP = "\nhttpc is a curl-like application but supports HTTP protocol only.\n" +
                                               "Usage:\n\thttpc command [arguments]\n" +

@@ -11,13 +11,11 @@ public abstract class BaseMethod {
     private List<String> headers;
     private boolean verbose;
     private String fileOutput;
+    private String status;
 
-    BaseMethod(String host, String uri, List<String> headers, boolean verbose, String fileOutput) {
-        this.host = host;
-        this.uri = uri;
+    BaseMethod(List<String> headers, boolean verbose) {
         this.headers = headers;
         this.verbose = verbose;
-        this.fileOutput = fileOutput;
     }
 
     public String getHost() {
@@ -68,6 +66,14 @@ public abstract class BaseMethod {
 
     public void setFileOutput(String fileOutput) {
         this.fileOutput = fileOutput;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public abstract String getMethod();

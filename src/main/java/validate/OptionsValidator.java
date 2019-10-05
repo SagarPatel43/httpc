@@ -22,11 +22,11 @@ public final class OptionsValidator {
 
     public static BaseMethod validate(String method, String[] args) throws HttpcException {
         try {
+            BaseMethod baseMethod;
             boolean verbose = false;
-            String outputFilePath = "";
-
             List<String> headers = new ArrayList<>();
 
+            // Configure j-opt parser for valid flags
             OptionParser parser = new OptionParser();
 
             OptionSpec<Void> verboseSpec = parser.accepts("v");
@@ -35,14 +35,15 @@ public final class OptionsValidator {
             OptionSpec<String> fileOutputSpec = parser.accepts("o")
                     .withRequiredArg();
 
-            OptionSpec<String> inline = null;
-            OptionSpec<String> file = null;
+            OptionSpec<String> inlineSpec = null;
+            OptionSpec<String> fileSpec = null;
 
+            // If method is POST, parser should also accept d xor f
             if (method.equalsIgnoreCase(POST)) {
-                inline = parser.accepts("d")
+                inlineSpec = parser.accepts("d")
                         .withRequiredArg();
-                file = parser.accepts("f")
-                        .availableUnless(inline)
+                fileSpec = parser.accepts("f")
+                        .availableUnless(inlineSpec)
                         .withRequiredArg();
             }
 
@@ -50,9 +51,6 @@ public final class OptionsValidator {
 
             if (options.has(verboseSpec)) {
                 verbose = true;
-            }
-            if (options.has(fileOutputSpec)) {
-                outputFilePath = options.valueOf(fileOutputSpec);
             }
             if (options.has(headersSpec)) {
                 for (String header : options.valuesOf(headersSpec)) {
@@ -66,19 +64,26 @@ public final class OptionsValidator {
             if (method.equalsIgnoreCase(POST)) {
                 String body = "";
 
-                if (inline != null && options.has(inline)) {
-                    body = options.valueOf(inline);
+                if (inlineSpec != null && options.has(inlineSpec)) {
+                    body = options.valueOf(inlineSpec);
                 }
-                else if (file != null && options.has(file)) {
-                    String filePath = options.valueOf(file);
+                else if (fileSpec != null && options.has(fileSpec)) {
+                    String filePath = options.valueOf(fileSpec);
                     body = FileService.getBodyFromFile(filePath);
                 }
+                // implicitly added content-length header since mandatory for POST requests
                 headers.add(CONTENT_LENGTH + body.length());
 
-                return new PostMethod("", "", headers, verbose, body, outputFilePath);
+                baseMethod = new PostMethod(headers, verbose, body);
+            } else {
+                baseMethod = new GetMethod(headers, verbose);
             }
 
-            return new GetMethod("", "", headers, verbose, outputFilePath);
+            if (options.has(fileOutputSpec)) {
+                baseMethod.setFileOutput(options.valueOf(fileOutputSpec));
+            }
+
+            return baseMethod;
         } catch (HttpcException e) {
             throw e;
         } catch (Exception e) {

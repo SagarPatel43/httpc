@@ -8,8 +8,8 @@ public class PostMethod extends BaseMethod {
 
     private String body;
 
-    public PostMethod(String host, String uri, List<String> headers, boolean verbose, String body, String fileOutput) {
-        super(host, uri, headers, verbose, fileOutput);
+    public PostMethod(List<String> headers, boolean verbose, String body) {
+        super(headers, verbose);
         this.body = body;
     }
 
