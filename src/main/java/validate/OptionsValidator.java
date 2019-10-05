@@ -23,12 +23,16 @@ public final class OptionsValidator {
     public static BaseMethod validate(String method, String[] args) throws HttpcException {
         try {
             boolean verbose = false;
+            String outputFilePath = "";
+
             List<String> headers = new ArrayList<>();
 
             OptionParser parser = new OptionParser();
 
             OptionSpec<Void> verboseSpec = parser.accepts("v");
             OptionSpec<String> headersSpec = parser.accepts("h")
+                    .withRequiredArg();
+            OptionSpec<String> fileOutputSpec = parser.accepts("o")
                     .withRequiredArg();
 
             OptionSpec<String> inline = null;
@@ -46,6 +50,9 @@ public final class OptionsValidator {
 
             if (options.has(verboseSpec)) {
                 verbose = true;
+            }
+            if (options.has(fileOutputSpec)) {
+                outputFilePath = options.valueOf(fileOutputSpec);
             }
             if (options.has(headersSpec)) {
                 for (String header : options.valuesOf(headersSpec)) {
@@ -68,10 +75,10 @@ public final class OptionsValidator {
                 }
                 headers.add(CONTENT_LENGTH + body.length());
 
-                return new PostMethod("", "", headers, verbose, body);
+                return new PostMethod("", "", headers, verbose, body, outputFilePath);
             }
 
-            return new GetMethod("", "", headers, verbose);
+            return new GetMethod("", "", headers, verbose, outputFilePath);
         } catch (HttpcException e) {
             throw e;
         } catch (Exception e) {

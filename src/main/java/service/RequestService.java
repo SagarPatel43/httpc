@@ -3,10 +3,7 @@ package service;
 import exception.HttpcException;
 import method.BaseMethod;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -16,7 +13,7 @@ public class RequestService {
     private static final int DEFAULT_PORT = 80;
 
     public static void execute(BaseMethod method) throws HttpcException {
-        try{
+        try {
             InetAddress address = InetAddress.getByName(method.getHost());
             Socket socket = new Socket(address, DEFAULT_PORT);
 
@@ -26,7 +23,12 @@ public class RequestService {
             out.println(method);
 
             String output = getOutput(in, method.isVerbose());
-            System.out.println(output);
+            // Console
+            if (method.getFileOutput().isEmpty()) {
+                System.out.println(output);
+            } else {
+                outputToFile(method.getFileOutput(), output);
+            }
 
             in.close();
             socket.close();
@@ -36,8 +38,12 @@ public class RequestService {
         } catch (IOException e) {
             throw new HttpcException("Network error");
         }
+    }
 
-
+    private static void outputToFile(String filePath, String output) throws IOException {
+        PrintWriter printWriter = new PrintWriter(new FileWriter(filePath));
+        printWriter.println(output);
+        printWriter.close();
     }
 
     private static String getOutput(BufferedReader in, boolean verbose) throws IOException {
