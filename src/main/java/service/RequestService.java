@@ -15,7 +15,7 @@ public class RequestService {
     private static final int DEFAULT_PORT = 80;
 
     public static void execute(BaseMethod method) {
-        try{
+        try {
             InetAddress address = InetAddress.getByName(method.getHost());
             Socket socket = new Socket(address, DEFAULT_PORT);
 
@@ -24,13 +24,8 @@ public class RequestService {
 
             out.println(method);
 
-            String line;
-            while((line = in.readLine()) != null) {
-                System.out.println(line);
-            }
-
-            // TODO Depending on verbose, produce different output using socket.
-
+            String output = getOutput(in, method.isVerbose());
+            System.out.println(output);
 
             in.close();
             socket.close();
@@ -45,5 +40,28 @@ public class RequestService {
         }
 
 
+    }
+
+    private static String getOutput(BufferedReader in, boolean verbose) throws IOException {
+        String line;
+        StringBuilder output = new StringBuilder();
+        boolean entityBody = false;
+        while ((line = in.readLine()) != null) {
+            //if verbose, display everything (Header and Body)
+            if (verbose) {
+                output.append(line).append("\n");
+            }
+            //if not verbose, display only body by trimming header
+            else {
+                if (!entityBody && line.trim().isEmpty()) {
+                    entityBody = true;
+                }
+                if (entityBody) {
+                    output.append(line).append("\n");
+                }
+
+            }
+        }
+        return output.toString();
     }
 }
