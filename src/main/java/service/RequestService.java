@@ -1,5 +1,6 @@
 package service;
 
+import exception.HttpcException;
 import method.BaseMethod;
 
 import java.io.BufferedReader;
@@ -14,8 +15,8 @@ public class RequestService {
 
     private static final int DEFAULT_PORT = 80;
 
-    public static void execute(BaseMethod method) {
-        try {
+    public static void execute(BaseMethod method) throws HttpcException {
+        try{
             InetAddress address = InetAddress.getByName(method.getHost());
             Socket socket = new Socket(address, DEFAULT_PORT);
 
@@ -31,12 +32,9 @@ public class RequestService {
             socket.close();
 
         } catch (UnknownHostException e) {
-            // TODO double check exceptions everywhere
-            System.err.println("Host given to InetAddress is invalid (invalid host)");
-            e.printStackTrace();
+            throw new HttpcException("Could not connect to URL provided");
         } catch (IOException e) {
-            System.err.println("Network error");
-            e.printStackTrace();
+            throw new HttpcException("Network error");
         }
 
 
