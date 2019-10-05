@@ -7,7 +7,7 @@ import joptsimple.OptionSpec;
 import method.BaseMethod;
 import method.GetMethod;
 import method.PostMethod;
-import service.FileReadingService;
+import service.FileService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public final class OptionsValidator {
                 }
                 else if (file != null && options.has(file)) {
                     String filePath = options.valueOf(file);
-                    body = FileReadingService.getBodyFromFile(filePath);
+                    body = FileService.getBodyFromFile(filePath);
                 }
                 headers.add(CONTENT_LENGTH + body.length());
 

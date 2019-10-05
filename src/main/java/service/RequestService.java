@@ -3,10 +3,15 @@ package service;
 import exception.HttpcException;
 import method.BaseMethod;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import static service.FileService.outputToFile;
 
 public class RequestService {
 
@@ -38,12 +43,6 @@ public class RequestService {
         } catch (IOException e) {
             throw new HttpcException("Network error");
         }
-    }
-
-    private static void outputToFile(String filePath, String output) throws IOException {
-        PrintWriter printWriter = new PrintWriter(new FileWriter(filePath));
-        printWriter.println(output);
-        printWriter.close();
     }
 
     private static String getOutput(BufferedReader in, boolean verbose) throws IOException {
