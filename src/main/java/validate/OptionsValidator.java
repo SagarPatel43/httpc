@@ -23,7 +23,7 @@ public final class OptionsValidator {
     public static BaseMethod validate(String method, String[] args) throws HttpcException {
         try {
             BaseMethod baseMethod;
-            boolean verbose = false;
+            boolean verbose;
             List<String> headers = new ArrayList<>();
 
             // Configure j-opt parser for valid flags
@@ -49,9 +49,8 @@ public final class OptionsValidator {
 
             OptionSet options = parser.parse(args);
 
-            if (options.has(verboseSpec)) {
-                verbose = true;
-            }
+            verbose = options.has(verboseSpec);
+
             if (options.has(headersSpec)) {
                 for (String header : options.valuesOf(headersSpec)) {
                     // Ignore explicit content-length headers, will be handled by the client.
@@ -87,6 +86,7 @@ public final class OptionsValidator {
         } catch (HttpcException e) {
             throw e;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new HttpcException("Something went wrong while trying to parse the flags provided");
         }
     }

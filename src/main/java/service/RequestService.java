@@ -66,7 +66,7 @@ public class RequestService {
             if (!status && line.split(" ").length > 1) {
                 method.setStatus(line.split(" ")[1]);
                 status = true;
-                redirect = true;
+                redirect = method.getStatus().startsWith(REDIRECT_PREFIX);
             }
             if (redirect && line.startsWith(LOCATION)) {
                 String urlHost = line.split(": ")[1].replaceAll("(http://|https://)", "");

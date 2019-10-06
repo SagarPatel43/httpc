@@ -5,21 +5,15 @@ import method.BaseMethod;
 import validate.OptionsValidator;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static constant.Constants.*;
 
 public class ParsingService {
 
-    private static final Set<String> METHODS = new HashSet<>();
     private static final Map<String, String> HELP_METHODS = new HashMap<>();
 
     static {
-        METHODS.add(GET);
-        METHODS.add(POST);
-
         HELP_METHODS.put(GET, GET_HELP);
         HELP_METHODS.put(POST, POST_HELP);
     }
@@ -40,7 +34,7 @@ public class ParsingService {
         else if (args.length == 2 && args[0].equalsIgnoreCase(HELP)) {
             String method = args[1].toUpperCase();
 
-            if (HELP_METHODS.get(method) != null) {
+            if (HELP_METHODS.containsKey(method)) {
                 System.out.println(HELP_METHODS.get(method));
                 System.exit(0);
             }
@@ -65,8 +59,9 @@ public class ParsingService {
             }
 
             // First check if valid HTTP method was provided (GET/POST) and flags
-            if (METHODS.contains(requestMethod)) {
-                httpMethod = OptionsValidator.validate(requestMethod, args);
+            if (HELP_METHODS.containsKey(requestMethod)) {
+                String[] flagArgs = getFlagsArray(args);
+                httpMethod = OptionsValidator.validate(requestMethod, flagArgs);
             }
             else {
                 throw new HttpcException("Only GET/POST methods are currently supported");
@@ -77,5 +72,13 @@ public class ParsingService {
         }
 
         return httpMethod;
+    }
+
+    // Method and URL have already been parsed, so do not consider these when parsing flags
+    private static String[] getFlagsArray(String[] args) {
+        String[] flagArgs = new String[args.length - 2];
+        System.arraycopy(args, 1, flagArgs, 0, flagArgs.length);
+
+        return flagArgs;
     }
 }
