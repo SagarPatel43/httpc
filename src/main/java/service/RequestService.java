@@ -93,7 +93,6 @@ public final class RequestService {
                 }
                 String[] headerValue = line.split(": ");
                 response.addHeader(headerValue[0], headerValue[1]);
-                response.appendHeaderResponse(line + "\r\n");
             }
             else {
                 response.appendBody(line + "\n");

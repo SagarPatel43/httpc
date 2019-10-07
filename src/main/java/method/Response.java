@@ -8,13 +8,11 @@ public class Response {
     private String statusCode;
     private String reasonPhrase;
     private Map<String, String> headers;
-    private String headerResponse;
     private String body;
 
     public Response() {
         this.statusCode = "";
         this.headers = new HashMap<>();
-        this.headerResponse = "";
         this.body = "";
     }
 
@@ -38,12 +36,18 @@ public class Response {
         this.body += body;
     }
 
-    public void appendHeaderResponse(String line) {
-        headerResponse += line;
+    private String getHeadersResponse() {
+        StringBuilder headersResponse = new StringBuilder();
+        headers.forEach((header, headerValue) -> headersResponse.append(header)
+                .append(": ")
+                .append(headerValue)
+                .append("\r\n"));
+
+        return headersResponse.toString();
     }
 
     public String getVerboseOutput() {
-        return httpVersion + " " + statusCode + " " + reasonPhrase + "\r\n" + headerResponse + "\r\n" + body;
+        return httpVersion + " " + statusCode + " " + reasonPhrase + "\r\n" + getHeadersResponse() + "\r\n" + body;
     }
 
     public String getSimpleOutput() {
@@ -72,13 +76,5 @@ public class Response {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public String getHeaderResponse() {
-        return headerResponse;
-    }
-
-    public void setHeaderResponse(String headerResponse) {
-        this.headerResponse = headerResponse;
     }
 }
