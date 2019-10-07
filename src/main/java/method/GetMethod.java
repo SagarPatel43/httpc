@@ -1,12 +1,12 @@
 package method;
 
-import java.util.List;
+import java.util.Map;
 
 import static constant.Constants.GET;
 
 public class GetMethod extends BaseMethod {
 
-    public GetMethod(List<String> headers, boolean verbose) {
+    public GetMethod(Map<String, String> headers, boolean verbose) {
         super(headers, verbose);
     }
 

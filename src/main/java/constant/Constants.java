@@ -30,6 +30,6 @@ public abstract class Constants {
                                            "\t-f file\t        associates the content of a file to the body HTTP POST request.\n" +
                                            "\nEither [-d] or [-f] can be used but not both\n";
 
-    public final static String CONTENT_LENGTH = "Content-Length: ";
-
+    public final static String CONTENT_LENGTH = "Content-Length";
+    public final static String USER_AGENT = "User-Agent";
 }

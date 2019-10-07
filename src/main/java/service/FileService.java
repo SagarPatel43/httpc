@@ -4,7 +4,9 @@ import exception.HttpcException;
 
 import java.io.*;
 
-public class FileService {
+public final class FileService {
+
+    private FileService() {}
 
     public static String getBodyFromFile(String filePath) throws HttpcException {
         File file = new File(filePath);

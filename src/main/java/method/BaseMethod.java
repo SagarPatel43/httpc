@@ -1,6 +1,6 @@
 package method;
 
-import java.util.List;
+import java.util.Map;
 
 import static constant.Constants.HTTP1;
 
@@ -8,12 +8,11 @@ public abstract class BaseMethod {
 
     private String host;
     private String uri;
-    private List<String> headers;
+    private Map<String, String> headers;
     private boolean verbose;
     private String fileOutput;
-    private String status;
 
-    BaseMethod(List<String> headers, boolean verbose) {
+    BaseMethod(Map<String, String> headers, boolean verbose) {
         this.headers = headers;
         this.verbose = verbose;
     }
@@ -34,21 +33,21 @@ public abstract class BaseMethod {
         this.uri = uri;
     }
 
-    public List<String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
-    String getHeadersRequest() {
+    private String getHeadersRequest() {
         StringBuilder headersRequest = new StringBuilder();
-        for (String header : headers) {
-            headersRequest.append(header)
-                    .append("\r\n");
-        }
+        headers.forEach((header, headerValue) -> headersRequest.append(header)
+                .append(": ")
+                .append(headerValue)
+                .append("\r\n"));
 
         return headersRequest.toString();
     }
 
-    public void setHeaders(List<String> headers) {
+    public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
@@ -66,14 +65,6 @@ public abstract class BaseMethod {
 
     public void setFileOutput(String fileOutput) {
         this.fileOutput = fileOutput;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public abstract String getMethod();

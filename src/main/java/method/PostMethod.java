@@ -1,6 +1,6 @@
 package method;
 
-import java.util.List;
+import java.util.Map;
 
 import static constant.Constants.POST;
 
@@ -8,7 +8,7 @@ public class PostMethod extends BaseMethod {
 
     private String body;
 
-    public PostMethod(List<String> headers, boolean verbose, String body) {
+    public PostMethod(Map<String, String> headers, boolean verbose, String body) {
         super(headers, verbose);
         this.body = body;
     }

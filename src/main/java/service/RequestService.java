@@ -2,6 +2,7 @@ package service;
 
 import exception.HttpcException;
 import method.BaseMethod;
+import method.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,11 +16,15 @@ import static constant.Constants.LOCATION;
 import static constant.Constants.REDIRECT_PREFIX;
 import static service.FileService.outputToFile;
 
-public class RequestService {
+public final class RequestService {
+
+    private RequestService() {}
 
     private static final int DEFAULT_PORT = 80;
 
     public static void execute(BaseMethod method) throws HttpcException {
+        Response response;
+
         do {
             try {
                 InetAddress address = InetAddress.getByName(method.getHost());
@@ -30,9 +35,10 @@ public class RequestService {
 
                 out.println(method);
 
-                String output = getOutput(in, method);
+                response = getOutput(in);
 
-                if (!method.getStatus().startsWith(REDIRECT_PREFIX)) {
+                if (!response.getStatusCode().startsWith(REDIRECT_PREFIX)) {
+                    String output = (method.isVerbose()) ? response.getVerboseOutput() : response.getSimpleOutput();
                     // Console
                     if (method.getFileOutput() == null) {
                         System.out.println(output);
@@ -40,8 +46,11 @@ public class RequestService {
                     else {
                         outputToFile(method.getFileOutput(), output);
                     }
-                } else {
-                    System.out.println("\nDestination issued a " + method.getStatus() + " redirect to new location: " + method.getUri());
+                }
+                else {
+                    method.setUri(response.getHeaderValue(LOCATION));
+                    System.out.println(
+                            "\nDestination issued a " + response.getStatusCode() + " redirect to new location: " + method.getUri());
                     System.out.println("Issuing new request...\n");
                 }
 
@@ -52,43 +61,53 @@ public class RequestService {
             } catch (IOException e) {
                 throw new HttpcException("Network error");
             }
-        } while(method.getStatus().startsWith(REDIRECT_PREFIX));
+        } while (response.getStatusCode().startsWith(REDIRECT_PREFIX));
     }
 
-    private static String getOutput(BufferedReader in, BaseMethod method) throws IOException {
-        String line;
-        StringBuilder output = new StringBuilder();
+    private static Response getOutput(BufferedReader in) throws IOException, HttpcException {
+        Response response = new Response();
+
         boolean entityBody = false;
         boolean status = false;
-        boolean redirect = false;
+
+        String line;
         while ((line = in.readLine()) != null) {
             //parse out status present in first line of output
-            if (!status && line.split(" ").length > 1) {
-                method.setStatus(line.split(" ")[1]);
+            if (!status) {
+                if (line.split(" ").length < 3) {
+                    throw new HttpcException("Invalid status-line returned in response");
+                }
+                String[] statusLine = line.split(" ", 3);
+                response.setHttpVersion(statusLine[0]);
+                response.setStatusCode(statusLine[1]);
+                response.setReasonPhrase(statusLine[2]);
+
                 status = true;
-                redirect = method.getStatus().startsWith(REDIRECT_PREFIX);
             }
-            if (redirect && line.startsWith(LOCATION)) {
-                String urlHost = line.split(": ")[1].replaceAll("(http://|https://)", "");
-                method.setUri(urlHost.substring(urlHost.indexOf("/")));
-                break;
+            else if (!entityBody && line.trim().isEmpty()) {
+                entityBody = true;
             }
-
-            //if verbose, display everything (Header and Body)
-            if (method.isVerbose()) {
-                output.append(line).append("\n");
+            else if (!entityBody) {
+                if (line.split(": ").length < 2) {
+                    throw new HttpcException("Invalid header returned in response");
+                }
+                String[] headerValue = line.split(": ");
+                response.addHeader(headerValue[0], headerValue[1]);
+                response.appendHeaderResponse(line + "\r\n");
             }
-            //if not verbose, display only body
             else {
-                if (!entityBody && line.trim().isEmpty()) {
-                    entityBody = true;
-                }
-                if (entityBody) {
-                    output.append(line).append("\n");
-                }
-
+                response.appendBody(line + "\n");
             }
         }
-        return output.toString();
+
+        if(!response.getBody().isEmpty()) {
+            response.setBody(removeLastChar(response.getBody()));
+        }
+
+        return response;
+    }
+
+    private static String removeLastChar(String line) {
+        return line.substring(0, line.length() - 1);
     }
 }

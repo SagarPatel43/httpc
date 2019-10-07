@@ -9,22 +9,20 @@ import method.GetMethod;
 import method.PostMethod;
 import service.FileService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static constant.Constants.CONTENT_LENGTH;
-import static constant.Constants.POST;
+import static constant.Constants.*;
 
 public final class OptionsValidator {
 
-    private OptionsValidator() {
-    }
+    private OptionsValidator() {}
 
     public static BaseMethod validate(String method, String[] args) throws HttpcException {
         try {
             BaseMethod baseMethod;
             boolean verbose;
-            List<String> headers = new ArrayList<>();
+            Map<String, String> headers = new HashMap<>();
 
             // Configure j-opt parser for valid flags
             OptionParser parser = new OptionParser();
@@ -53,9 +51,11 @@ public final class OptionsValidator {
 
             if (options.has(headersSpec)) {
                 for (String header : options.valuesOf(headersSpec)) {
-                    // Ignore explicit content-length headers, will be handled by the client.
-                    if (!header.contains(CONTENT_LENGTH)) {
-                        headers.add(header);
+                    if (header.split(": ").length > 1) {
+                        String[] headerLine = header.split(": ");
+                        headers.put(headerLine[0], headerLine[1]);
+                    } else{
+                        throw new HttpcException("Invalid header provided (must be in format k: v)");
                     }
                 }
             }
@@ -71,7 +71,9 @@ public final class OptionsValidator {
                     body = FileService.getBodyFromFile(filePath);
                 }
                 // implicitly added content-length header since mandatory for POST requests
-                headers.add(CONTENT_LENGTH + body.length());
+                headers.put(CONTENT_LENGTH, Integer.toString(body.length()));
+                headers.put(USER_AGENT, "445 Httpc Client");
+
 
                 baseMethod = new PostMethod(headers, verbose, body);
             } else {

@@ -9,7 +9,9 @@ import java.util.Map;
 
 import static constant.Constants.*;
 
-public class ParsingService {
+public final class ParsingService {
+
+    private ParsingService() {}
 
     private static final Map<String, String> HELP_METHODS = new HashMap<>();
 
