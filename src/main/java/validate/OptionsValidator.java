@@ -60,6 +60,8 @@ public final class OptionsValidator {
                 }
             }
 
+            headers.put(USER_AGENT, "445 Httpc Client");
+
             if (method.equalsIgnoreCase(POST)) {
                 String body = "";
 
@@ -72,8 +74,6 @@ public final class OptionsValidator {
                 }
                 // implicitly added content-length header since mandatory for POST requests
                 headers.put(CONTENT_LENGTH, Integer.toString(body.length()));
-                headers.put(USER_AGENT, "445 Httpc Client");
-
 
                 baseMethod = new PostMethod(headers, verbose, body);
             } else {
