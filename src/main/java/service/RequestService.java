@@ -57,10 +57,8 @@ public final class RequestService {
                 out.close();
                 socket.close();
             } catch (UnknownHostException e) {
-                e.printStackTrace();
                 throw new HttpcException("Could not connect to URL provided");
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new HttpcException("Network error");
             }
         } while (response.getStatusCode().startsWith(REDIRECT_PREFIX));
