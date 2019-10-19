@@ -20,7 +20,6 @@ public final class RequestService {
 
     private RequestService() {}
 
-    private static final int DEFAULT_PORT = 80;
 
     public static void execute(BaseMethod method) throws HttpcException {
         Response response;
@@ -28,7 +27,7 @@ public final class RequestService {
         do {
             try {
                 InetAddress address = InetAddress.getByName(method.getHost());
-                Socket socket = new Socket(address, DEFAULT_PORT);
+                Socket socket = new Socket(address, method.getPort());
 
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -55,10 +54,13 @@ public final class RequestService {
                 }
 
                 in.close();
+                out.close();
                 socket.close();
             } catch (UnknownHostException e) {
+                e.printStackTrace();
                 throw new HttpcException("Could not connect to URL provided");
             } catch (IOException e) {
+                e.printStackTrace();
                 throw new HttpcException("Network error");
             }
         } while (response.getStatusCode().startsWith(REDIRECT_PREFIX));

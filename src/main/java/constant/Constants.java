@@ -2,6 +2,8 @@ package constant;
 
 public abstract class Constants {
 
+    public static final int DEFAULT_HTTP_PORT = 80;
+
     public final static String HELP = "help";
     public final static String GET = "GET";
     public final static String POST = "POST";

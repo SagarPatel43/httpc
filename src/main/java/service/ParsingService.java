@@ -53,10 +53,17 @@ public final class ParsingService {
             // Clean up URL - extract host and URI
             String host;
             String uri;
-            if (urlHost.contains("/")) {
+            int port;
+            if (urlHost.contains("/") && !urlHost.contains(":")) {
                 host = urlHost.substring(0, urlHost.indexOf("/"));
+                port = DEFAULT_HTTP_PORT;
                 uri = urlHost.substring(urlHost.indexOf("/"));
-            } else {
+            } else if (urlHost.contains("/") && urlHost.contains(":")) {
+                host = urlHost.substring(0, urlHost.indexOf(":"));
+                port = Integer.parseInt(urlHost.substring(urlHost.indexOf(":") + 1, urlHost.indexOf("/")));
+                uri = urlHost.substring(urlHost.indexOf("/"));
+            }
+            else {
                 throw new HttpcException("Invalid URL provided, make sure the URL contains a location (e.g. example.com/status)");
             }
 
@@ -70,6 +77,7 @@ public final class ParsingService {
             }
 
             httpMethod.setHost(host);
+            httpMethod.setPort(port);
             httpMethod.setUri(uri);
         }
 

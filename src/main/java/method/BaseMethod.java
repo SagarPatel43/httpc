@@ -8,6 +8,7 @@ public abstract class BaseMethod {
 
     private String host;
     private String uri;
+    private int port;
     private Map<String, String> headers;
     private boolean verbose;
     private String fileOutput;
@@ -74,5 +75,13 @@ public abstract class BaseMethod {
         String requestLine = getMethod() + " " + getUri() + " " + HTTP1 + "\r\n";
         String headers = getHeadersRequest();
         return requestLine + headers;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }
