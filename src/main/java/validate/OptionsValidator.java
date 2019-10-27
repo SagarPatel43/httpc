@@ -42,6 +42,7 @@ public final class OptionsValidator {
                         .withRequiredArg();
                 fileSpec = parser.accepts("f")
                         .availableUnless(inlineSpec)
+                        .requiredUnless(inlineSpec)
                         .withRequiredArg();
             }
 
